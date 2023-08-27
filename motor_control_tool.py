@@ -1,14 +1,10 @@
 import struct
 import serial
-import tkinter as tk
-from tkinter import ttk
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import enum
 import serial.tools.list_ports
 import threading
 import time
-import random
 
 class MotorMode(enum.Enum):
     STOP = 0
@@ -44,21 +40,6 @@ class ArduinoController:
         self.actual_current_list = []
         self.desired_current_list = []
 
-        num_points = 1000
-
-        # self.desired_position_list = [random.uniform(0, 100) for _ in range(num_points)]
-        # self.actual_position_list = [val + random.uniform(-5, 5) for val in self.desired_position_list]
-
-        # self.desired_velocity_list = [random.uniform(0, 10) for _ in range(num_points)]
-        # self.actual_velocity_list = [val + random.uniform(-2, 2) for val in self.desired_velocity_list]
-
-        # self.desired_ff_list = [random.uniform(0, 50) for _ in range(num_points)]
-        # self.actual_torque_list = [random.uniform(0, 50) for _ in range(num_points)]
-        # self.actual_torque_filtered_list = [val + random.uniform(-1, 1) for val in self.actual_torque_list]
-
-        # self.actual_current_list = [random.uniform(0, 5) for _ in range(num_points)]
-        # self.desired_current_list = [val + random.uniform(-0.5, 0.5) for val in self.actual_current_list]
-
         self.injection_params = None
         self.ampl = 0
         self.freq = 0
@@ -83,7 +64,6 @@ class ArduinoController:
         self.read_thread = threading.Thread(target=self.serial_manager)
         self.read_thread.start()
        
-
     def serial_manager(self):
         while True:
             print("Serial manager") 
@@ -100,6 +80,7 @@ class ArduinoController:
                 print("after write state machine")
                 self.write_flag = False
                 print(f" writing? {self.write_flag}")
+
 
     def read_state_machine(self):
         while True:
@@ -131,18 +112,18 @@ class ArduinoController:
                 self.read_torque()
                 self.plot_data(data_series_1=self.desired_ff_list,
                             data_series_2=self.actual_torque_list,
-                            data_series_3=self.actual_torque_filtered_list,  # Added this line
+                            data_series_3=self.actual_torque_filtered_list,  
                             samples_to_plot=self.samples_to_plot,
                             title="Torque",
                             xlabel="Sample Number",
                             series1_label="Desired Torque",
                             series2_label="Actual Torque",
-                            series3_label="Filtered Actual Torque")  # Label for the third series
+                            series3_label="Filtered Actual Torque")  
 
             elif self.injection_params == InjectedParams.CURRENT.value:
                 self.read_current()
-                self.plot_data(data_series_1=self.desired_current_list,  # Replace with your actual list name if different
-                            data_series_2=self.actual_current_list,    # Replace with your actual list name if different
+                self.plot_data(data_series_1=self.desired_current_list,  
+                            data_series_2=self.actual_current_list,   
                             samples_to_plot=self.samples_to_plot,
                             title="Current",
                             xlabel="Sample Number",
@@ -174,18 +155,15 @@ class ArduinoController:
                 self.ax.plot(range(len(data_series_3)-available_samples_3, len(data_series_3)), 
                             data_series_3[-available_samples_3:], label=series3_label)
 
-        # Set titles and labels
+
         self.ax.set_title(title)
         self.ax.set_xlabel(xlabel)
         
         # Update the x-axis limits
         if len(data_series_1) >= available_samples_1:
             self.ax.set_xlim(len(data_series_1)-available_samples_1, len(data_series_1))
-
-        # Display the legend. This will show the labels for each data series.
         self.ax.legend(loc ='upper right')
 
-        # Redraw the canvas. This updates the figure with the new plot.
         self.fig.canvas.draw()
         # print(f"delta time is: {time.time() - self.start_time}")
 
@@ -328,22 +306,4 @@ class ArduinoController:
 
 
 
-
-
-# import serial
-
-# ser = serial.Serial('/dev/ttyUSB0', 3000000, timeout=1)
-# ser.write(b'\x01\x03\x00\x00\x00\x00?\x00\x00\x00?\x00\x00')
-# i = 0
-# while True:
-#     try:
-#         i+=1
-#         # Read the line (until newline)
-#         line = ser.readline().decode('ascii').strip()  # Decoding and stripping off any trailing whitespace or newline characters
-#         float_1 = float(line[72:75])
-#         float_2 = float(line[75:78])
-#         print(f"Float 1: {float_1}, Float 2: {float_2}, index: {i}")
-#         # print(line[71:75], len(line) , line[75:])
-#     except ValueError:
-#         continue
 

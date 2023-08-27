@@ -1,10 +1,8 @@
-import struct
 import serial
 import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import enum
 import serial.tools.list_ports
 from motor_control_tool import ArduinoController , InjectedParams, MessageTypes , MotorMode
 import time
@@ -143,7 +141,6 @@ class App:
             pass
 
         
-
     def delayed_update(self, attr):
         print("HEEEELOOOOOOO")
         if self._after_id:
@@ -235,25 +232,12 @@ class App:
             print("Thread is alive!")
         else:
             print("Thread is dead!")
-        # self.arduino.desired_position_list = []
-        # self.arduino.actual_position_list = []
-
-        # self.arduino.desired_velocity_list = []
-        # self.arduino.actual_velocity_list = []
-
-        # self.arduino.desired_ff_list = []
-        # self.arduino.actual_torque_list = []
-        # self.arduino.actual_torque_filtered_list = []
-
-        # self.arduino.actual_current_list = []
-        # self.arduino.desired_current_list = []
         
 
     def update_current_callback(self):
         print("front updating current")
         self.arduino.message_type = MessageTypes.CURRENT.value
         self.arduino.write_flag = True
-        # pass  # You can populate this function later
 
     def update_impedance_callback(self):
         print("front updating impedance")
@@ -262,15 +246,13 @@ class App:
 
     def update_plot(self):
         if self.arduino is None:
-            # Handle the case where the arduino is not initialized. Maybe print a message or return early.
             print("Arduino object is not initialized.")
             self.master.after(200, self.update_plot)
             return
         print("updating graph")
-        # Simply draw the updated figure from ArduinoController
         self.canvas.draw()
         
-        # Set an interval for updating the canvas to show the latest figure
+        # set an interval for updating the canvas to show the latest figure
         self.master.after(200, self.update_plot)
 
 
